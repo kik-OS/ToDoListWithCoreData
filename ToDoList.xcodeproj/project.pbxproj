@@ -64,11 +64,11 @@
 				E4942C58256D2E4B00585652 /* SceneDelegate.swift */,
 				E4942C5C256D2E4B00585652 /* Main.storyboard */,
 				E4942C6F256D2ED200585652 /* TaskTableViewController.swift */,
+				E496F06F256D378100D2B104 /* StorageManager.swift */,
 				E4942C62256D2E5100585652 /* Assets.xcassets */,
 				E4942C64256D2E5100585652 /* LaunchScreen.storyboard */,
 				E4942C67256D2E5100585652 /* Info.plist */,
 				E4942C5F256D2E4B00585652 /* ToDoList.xcdatamodeld */,
-				E496F06F256D378100D2B104 /* StorageManager.swift */,
 			);
 			path = ToDoList;
 			sourceTree = "<group>";

@@ -27,8 +27,6 @@ class StorageManager {
         return container
     }()
     
-
-    
     func saveContext () {
         if context.hasChanges {
             do {
@@ -39,7 +37,6 @@ class StorageManager {
             }
         }
     }
-    
     
     func deleteItem(at index: Int) {
         let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
@@ -56,22 +53,16 @@ class StorageManager {
         return task
     }
     
-    
     func fetchData( tasks: inout [Task]) {
         let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
         do {
             tasks = try context.fetch(fetchRequest)
-            
         } catch let error {
             print(error)
         }
     }
     
-    
     func applicationWillTerminate(_ application: UIApplication) {
         saveContext()
     }
-    
-    
-    
 }

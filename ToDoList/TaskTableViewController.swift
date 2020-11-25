@@ -9,32 +9,30 @@ import UIKit
 import CoreData
 
 class TaskTableViewController: UITableViewController {
-
+    
     private let storageManager = StorageManager.shared
-
     private var tasks: [Task] = []
     private var selectedIndexPath: Int?
     
-    
-//MARK: Override Methods
+    //MARK: Override Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigationBar()
         storageManager.fetchData(tasks: &tasks)
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tasks.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let task = tasks[indexPath.row]
         var content = cell.defaultContentConfiguration()
         content.text = task.name
+        content.image = UIImage(systemName: "circlebadge")
         cell.contentConfiguration = content
         return cell
-        
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -46,35 +44,24 @@ class TaskTableViewController: UITableViewController {
         }
     }
     
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-           tableView.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
         selectedIndexPath = indexPath.row
-           let task = tasks[indexPath.row]
+        let task = tasks[indexPath.row]
         showAlert(with: "Edit", message: "Do you want to edit your task?", taskName: task.name)
-        
-           
-       }
+    }
     
-    
-    
-    
-    
-    
-    
-//MARK: IB Actions
+    //MARK: IB Actions
     @IBAction func addNewTaskButton(_ sender: UIBarButtonItem) {
         showAlert(with: "Add New Task", message: "What do you want to do?", taskName: nil)
     }
     
-    
-    
-//MARK: Private Methods
-    private func reloadRowInTable(){
+    //MARK: Private Methods
+    private func reloadRowInTable() {
         let cellIndex = IndexPath(row: tasks.count - 1, section: 0)
         tableView.insertRows(at: [cellIndex], with: .automatic)
     }
-   
+    
     private func setupNavigationBar() {
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
@@ -87,43 +74,37 @@ class TaskTableViewController: UITableViewController {
     
     private func showAlert(with title: String, message: String, taskName: String?) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        
-        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let saveAction = UIAlertAction(title: "Save", style: .destructive) { _ in
             
             if taskName != nil {
-                // Здесь код для изменения таска
-                
-                guard let selectedIndexPath = self.selectedIndexPath else {return}
-                self.tasks[selectedIndexPath].name = alert.textFields?.first?.text
-                let cellIndex = IndexPath(row: selectedIndexPath, section: 0)
-                self.tableView.reloadRows(at: [cellIndex], with: .automatic)
-               
+                guard let editedTask = alert.textFields?.first?.text else {return}
+                self.editTask(taskName: editedTask)
             } else {
-            
-            guard let task = alert.textFields?.first?.text, !task.isEmpty else {return}
-            self.save(taskName: task)
-        }
+                guard let task = alert.textFields?.first?.text, !task.isEmpty else {return}
+                self.saveNewTask(taskName: task)
+            }
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
-        
-        alert.addTextField { textField in
-            textField.text = taskName
-        }
+        alert.addTextField { textField in textField.text = taskName }
         alert.addAction(cancelAction)
         alert.addAction(saveAction)
-        
-        
-        
         present(alert, animated: true)
-        
     }
-
-    private func save(taskName: String) {
+    
+    private func saveNewTask(taskName: String) {
         guard let task = storageManager.getTask() else {return}
         task.name = taskName
         tasks.append(task)
         reloadRowInTable()
+        storageManager.saveContext()
+    }
+    
+    private func editTask(taskName: String) {
+        guard let selectedIndexPath = selectedIndexPath else {return}
+        self.tasks[selectedIndexPath].name = taskName
+        let cellIndex = IndexPath(row: selectedIndexPath, section: 0)
+        tableView.reloadRows(at: [cellIndex], with: .left)
         storageManager.saveContext()
     }
 }
@@ -131,4 +112,3 @@ class TaskTableViewController: UITableViewController {
 
 
 
-    
